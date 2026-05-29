@@ -1,4 +1,6 @@
 local Games = {
+    -- Alchemy Academy
+    ["118821269826806"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/AlchemyAcademy"
     -- Anime Eternal
     ["7882829745"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AnimeEternal.lua",
     -- Anime Fight
