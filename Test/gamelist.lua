@@ -7,6 +7,8 @@ local Games = {
     ["8220767002"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Test/test/BeeGarden",
     -- Alchemy Academy
     ["10006104044"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Test/test/AlchemyAcademy",
+    -- Slime RNG
+    ["9792947201"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Test/test/Slime%20RNG",
 }
 
 
