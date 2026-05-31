@@ -1,6 +1,4 @@
 local Games = {
-    -- Alchemy Academy
-    ["118821269826806"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/AlchemyAcademy",
     -- Anime Eternal
     ["7882829745"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AnimeEternal.lua",
     -- Anime Fight
@@ -53,6 +51,8 @@ local Games = {
     ["4093155512"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Swordburst3.lua",
     -- The Forge
     ["7671049560"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/TheForgeFinal.lua"
+    -- Wizard Alchemy
+    ["118821269826806"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/Wizard%20Alchemy",
 }
 
 return Games
