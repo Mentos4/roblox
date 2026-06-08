@@ -188,6 +188,12 @@ function Library:RegisterElement(element, themeProperty, targetProperty)
     })
 end
 function Library:UpdateColorsUsingRegistry()
+    -- Derive InputBg from Element if a theme doesn't set it explicitly
+    if self.Theme.Element then
+        self.Theme.InputBg = self.Theme.Element:Lerp(Color3.new(0, 0, 0), 0.18)
+        self.Theme.ElementHover = self.Theme.Element:Lerp(Color3.new(1, 1, 1), 0.1)
+        self.Theme.BorderLight = self.Theme.Border:Lerp(Color3.new(1, 1, 1), 0.2)
+    end
     for _, entry in ipairs(self.Registry) do
         if entry.Callback then
             task.spawn(entry.Callback, self.Theme)
@@ -442,7 +448,7 @@ function Library:Notify(notifyOpts)
     local card = Create("Frame", {
         Size                = UDim2.new(1, 0, 0, 0),
         AutomaticSize       = Enum.AutomaticSize.Y,
-        BackgroundColor3    = theme.Element,
+        BackgroundColor3    = theme.InputBg,
         BackgroundTransparency = 1,
         Position            = UDim2.new(1, 20, 0, 0),
         ClipsDescendants    = false,
@@ -1220,18 +1226,18 @@ function Library:CreateKeybind(parent, options)
     local keyButton = Create("TextButton", {
         Size = UDim2.new(0.5, -5, 0, 28),
         Position = UDim2.new(0.5, 5, 0.5, -14),
-        BackgroundColor3 = self.Theme.Element,
+        BackgroundColor3 = self.Theme.InputBg,
         Text = tostring(currentKey.Name),
         TextColor3 = self.Theme.TextDim,
         Font = Enum.Font.GothamBold,
         TextSize = 12,
         Parent = keybind
     }, {
-        Create("UICorner", {CornerRadius = UDim.new(0, 4)}),
+        Create("UICorner", {CornerRadius = UDim.new(0, 7)}),
         Create("UIStroke", {Color = self.Theme.Border, Thickness = 1})
     })
     self:RegisterElement(nameLabel, "Text", "TextColor3")
-    self:RegisterElement(keyButton, "Element")
+    self:RegisterElement(keyButton, "InputBg")
     self:RegisterElement(keyButton:FindFirstChild("UIStroke"), "Border", "Color")
     self:RegisterElement(keyButton, "TextDim", "TextColor3")
     
@@ -1342,9 +1348,9 @@ function Library:CreateDropdown(parent, options)
         end
     end
     local drop = Create("Frame", {
-        Size = UDim2.new(1, 0, 0, 45),
+        Size = UDim2.new(1, 0, 0, 50),
         BackgroundTransparency = 1,
-        ClipsDescendants = false, 
+        ClipsDescendants = false,
         Parent = parent,
         ZIndex = 50
     })
@@ -1359,14 +1365,14 @@ function Library:CreateDropdown(parent, options)
         Parent = drop
     })
     local selectBtn = Create("TextButton", {
-        Size = UDim2.new(1, 0, 0, 24),
+        Size = UDim2.new(1, 0, 0, 28),
         Position = UDim2.new(0, 0, 0, 20),
-        BackgroundColor3 = self.Theme.Element,
+        BackgroundColor3 = self.Theme.InputBg,
         Text = "",
         AutoButtonColor = false,
         Parent = drop
     }, {
-        Create("UICorner", {CornerRadius = UDim.new(0, 4)})
+        Create("UICorner", {CornerRadius = UDim.new(0, 7)})
     })
     local displayLabel = Create("TextLabel", {
         Size = UDim2.new(1, -30, 1, 0),
@@ -1392,7 +1398,7 @@ function Library:CreateDropdown(parent, options)
     dropStroke.Color = self.Theme.Border
     dropStroke.Thickness = 1
     dropStroke.Parent = selectBtn
-    self:RegisterElement(selectBtn, "Element")
+    self:RegisterElement(selectBtn, "InputBg")
     self:RegisterElement(dropStroke, "Border", "Color")
     self:RegisterElement(displayLabel, "TextDim", "TextColor3")
     local list = Create("ScrollingFrame", {
@@ -1424,8 +1430,8 @@ function Library:CreateDropdown(parent, options)
             local absPos = selectBtn.AbsolutePosition
             local absSize = selectBtn.AbsoluteSize
             listScale.Scale = 1  -- list lives at root level; no inherited scale to compensate for
-            list.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 5)
-            list.Size = UDim2.fromOffset(absSize.X, math.min(#opts * 22 + 10, 150))
+            list.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y + 4)
+            list.Size = UDim2.fromOffset(absSize.X, math.min(#opts * 24 + 10, 160))
         end
     end
     local dropObj = {
@@ -1521,7 +1527,7 @@ function Library:CreateDropdown(parent, options)
                 isActive = (opt == currentVal)
             end
             local btn = Create("TextButton", {
-                Size = UDim2.new(1, 0, 0, 20),
+                Size = UDim2.new(1, 0, 0, 24),
                 BackgroundTransparency = 1,
                 Text = tostring(opt),
                 TextColor3 = isActive and self.Theme.Accent or self.Theme.TextDim,
@@ -1535,9 +1541,9 @@ function Library:CreateDropdown(parent, options)
                 dropObj:SetValue(opt)
             end)
         end
-        local h = math.min(#opts * 22 + 10, 150)
+        local h = math.min(#opts * 24 + 10, 160)
         list.Size = UDim2.new(1, 0, 0, h)
-        list.CanvasSize = UDim2.new(0, 0, 0, #opts * 22 + 10)
+        list.CanvasSize = UDim2.new(0, 0, 0, #opts * 24 + 10)
     end
     populate()
     function dropObj:Refresh(newOptions, keepCurrent)
@@ -3113,7 +3119,7 @@ function Library:CreateWindow(options)
                 local callback = boxOptions.Callback or function() end
                 local flag = boxOptions.Flag
                 local box = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 38),
+                    Size = UDim2.new(1, 0, 0, 44),
                     BackgroundTransparency = 1,
                     Parent = container
                 })
@@ -3128,27 +3134,27 @@ function Library:CreateWindow(options)
                     Parent = box
                 })
                 local input = Create("TextBox", {
-                    Size = UDim2.new(1, 0, 0, 18),
-                    Position = UDim2.new(0, 0, 0, 16),
-                    BackgroundColor3 = theme.Element,
+                    Size = UDim2.new(1, 0, 0, 24),
+                    Position = UDim2.new(0, 0, 0, 18),
+                    BackgroundColor3 = theme.InputBg,
                     Text = default,
                     PlaceholderText = placeholder,
                     TextColor3 = theme.Text,
                     PlaceholderColor3 = theme.TextMuted,
                     Font = Enum.Font.Gotham,
-                    TextSize = 11,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     ClearTextOnFocus = false,
                     Parent = box
                 }, {
-                    Create("UICorner", {CornerRadius = UDim.new(0, 4)}),
-                    Create("UIPadding", {PaddingLeft = UDim.new(0, 8)})
+                    Create("UICorner", {CornerRadius = UDim.new(0, 7)}),
+                    Create("UIPadding", {PaddingLeft = UDim.new(0, 10)})
                 })
                 local inputStroke = Instance.new("UIStroke")
                 inputStroke.Color = theme.Border
                 inputStroke.Thickness = 1
                 inputStroke.Parent = input
-                Library:RegisterElement(input, "Element")
+                Library:RegisterElement(input, "InputBg")
                 Library:RegisterElement(inputStroke, "Border", "Color")
                 local inputObj = {
                     Value = default,
@@ -3177,43 +3183,43 @@ function Library:CreateWindow(options)
                 local flag = checkOptions.Flag
                 local state = default
                 local check = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 22),
+                    Size = UDim2.new(1, 0, 0, 24),
                     BackgroundTransparency = 1,
                     Parent = container
                 })
                 local box = Create("TextButton", {
-                    Size = UDim2.new(0, 18, 0, 18),
-                    Position = UDim2.new(0, 0, 0.5, -9),
-                    BackgroundColor3 = theme.Element,
+                    Size = UDim2.new(0, 20, 0, 20),
+                    Position = UDim2.new(0, 0, 0.5, -10),
+                    BackgroundColor3 = theme.InputBg,
                     Text = "",
                     AutoButtonColor = false,
                     Parent = check
                 }, {
-                    Create("UICorner", {CornerRadius = UDim.new(1, 0)})
+                    Create("UICorner", {CornerRadius = UDim.new(0, 5)})
                 })
                 local boxStroke = Instance.new("UIStroke")
                 boxStroke.Color = theme.Border
                 boxStroke.Thickness = 1
                 boxStroke.Parent = box
                 local inner = Create("Frame", {
-                    Size = state and UDim2.new(0, 10, 0, 10) or UDim2.new(0, 0, 0, 0),
+                    Size = state and UDim2.new(0, 12, 0, 12) or UDim2.new(0, 0, 0, 0),
                     Position = UDim2.new(0.5, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(0.5, 0.5),
                     BackgroundColor3 = theme.Accent,
                     BorderSizePixel = 0,
                     Parent = box
-                }, {Create("UICorner", {CornerRadius = UDim.new(1, 0)})})
+                }, {Create("UICorner", {CornerRadius = UDim.new(0, 3)})})
                 Library:RegisterElement(boxStroke, "Border", "Color")
                 Library:RegisterElement(inner, "Accent")
                 table.insert(Library.Registry, {
                     Callback = function(theme)
                         local tTheme = theme or Library.Theme
-                        box.BackgroundColor3 = tTheme.Element
+                        box.BackgroundColor3 = tTheme.InputBg
                     end
                 })
                 Create("TextLabel", {
                     Size = UDim2.new(1, -30, 1, 0),
-                    Position = UDim2.new(0, 26, 0, 0),
+                    Position = UDim2.new(0, 28, 0, 0),
                     BackgroundTransparency = 1,
                     Text = checkName,
                     TextColor3 = theme.Text,
@@ -3227,13 +3233,15 @@ function Library:CreateWindow(options)
                     SetValue = function(self, val)
                         state = val
                         self.Value = val
-                        Tween(inner, {Size = val and UDim2.new(0, 10, 0, 10) or UDim2.new(0, 0, 0, 0)})
+                        Tween(inner, {Size = val and UDim2.new(0, 12, 0, 12) or UDim2.new(0, 0, 0, 0)})
                         callback(val)
                     end
                 }
                 box.MouseButton1Click:Connect(function()
                     checkObj:SetValue(not state)
                 end)
+                box.MouseEnter:Connect(function() Tween(box, {BackgroundColor3 = Library.Theme.ElementHover}) end)
+                box.MouseLeave:Connect(function() Tween(box, {BackgroundColor3 = Library.Theme.InputBg}) end)
                 Library:ApplyCommonProperties(check, checkOptions, checkObj)
                 if flag then Library.Toggles[flag] = checkObj end
                 if default then callback(true) end
@@ -3248,7 +3256,7 @@ function Library:CreateWindow(options)
                 local flag = colorOptions.Flag
                 local currentColor = default
                 local picker = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 24),
+                    Size = UDim2.new(1, 0, 0, 28),
                     BackgroundTransparency = 1,
                     Parent = container
                 })
@@ -3263,14 +3271,14 @@ function Library:CreateWindow(options)
                     Parent = picker
                 })
                 local colorBox = Create("TextButton", {
-                    Size = UDim2.new(0, 40, 0, 18),
-                    Position = UDim2.new(1, -45, 0.5, -9),
+                    Size = UDim2.new(0, 46, 0, 22),
+                    Position = UDim2.new(1, -50, 0.5, -11),
                     BackgroundColor3 = currentColor,
                     Text = "",
                     AutoButtonColor = false,
                     Parent = picker
                 }, {
-                    Create("UICorner", {CornerRadius = UDim.new(0, 4)})
+                    Create("UICorner", {CornerRadius = UDim.new(0, 6)})
                 })
                 local colorBoxStroke = Instance.new("UIStroke")
                 colorBoxStroke.Color = theme.Border
@@ -3278,16 +3286,16 @@ function Library:CreateWindow(options)
                 colorBoxStroke.Parent = colorBox
                 Library:RegisterElement(colorBoxStroke, "Border", "Color")
                 local popup = Create("Frame", {
-                    Size = UDim2.new(0, 160, 0, 130),
-                    Position = UDim2.new(1, 5, 0, 0),
-                    BackgroundColor3 = theme.Element,
+                    Size = UDim2.new(0, 165, 0, 135),
+                    Position = UDim2.new(1, 6, 0, 0),
+                    BackgroundColor3 = theme.InputBg,
                     Visible = false,
                     ZIndex = 200,
                     Parent = colorBox
                 }, {
-                    Create("UICorner", {CornerRadius = UDim.new(0, 8)}),
+                    Create("UICorner", {CornerRadius = UDim.new(0, 9)}),
                     Create("UIStroke", {Color = theme.Border, Thickness = 1, ZIndex = 200}),
-                    Create("UIPadding", {PaddingBottom = UDim.new(0, 5)}),
+                    Create("UIPadding", {PaddingBottom = UDim.new(0, 6)}),
                 })
                 local popupScale = Create("UIScale", {Parent = popup, Scale = 1})
                 local presets = {
@@ -3300,8 +3308,8 @@ function Library:CreateWindow(options)
                 }
                 -- Hex input at top of popup
                 local hexInput = Create("TextBox", {
-                    Size = UDim2.new(1, -10, 0, 22),
-                    Position = UDim2.new(0, 5, 0, 5),
+                    Size = UDim2.new(1, -12, 0, 24),
+                    Position = UDim2.new(0, 6, 0, 6),
                     BackgroundColor3 = theme.Element,
                     Text = "",
                     PlaceholderText = "#RRGGBB",
@@ -3313,8 +3321,8 @@ function Library:CreateWindow(options)
                     ZIndex = 202,
                     Parent = popup,
                 }, {
-                    Create("UICorner", {CornerRadius = UDim.new(0, 4)}),
-                    Create("UIPadding", {PaddingLeft = UDim.new(0, 6)}),
+                    Create("UICorner", {CornerRadius = UDim.new(0, 6)}),
+                    Create("UIPadding", {PaddingLeft = UDim.new(0, 8)}),
                 })
                 local function c3toHex(c)
                     return string.format("#%02X%02X%02X",
@@ -3710,25 +3718,45 @@ function Library:CreateWindow(options)
 
             function SectionFuncs:AddDivider(text)
                 local divider = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 16),
+                    Size = UDim2.new(1, 0, 0, 20),
                     BackgroundTransparency = 1,
                     Parent = container
                 })
                 if text and text ~= "" then
+                    local lineL = Create("Frame", {
+                        Size = UDim2.new(0.5, -40, 0, 1),
+                        Position = UDim2.new(0, 0, 0.5, 0),
+                        BackgroundColor3 = theme.BorderLight,
+                        BackgroundTransparency = 0.5,
+                        BorderSizePixel = 0,
+                        Parent = divider
+                    })
                     Create("TextLabel", {
-                        Size = UDim2.new(1, 0, 1, 0),
+                        Size = UDim2.new(0, 80, 1, 0),
+                        Position = UDim2.new(0.5, -40, 0, 0),
                         BackgroundTransparency = 1,
-                        Text = "— " .. text .. " —",
-                        TextColor3 = theme.TextMuted,
-                        Font = Enum.Font.Gotham,
+                        Text = text,
+                        TextColor3 = theme.TextDim,
+                        Font = Enum.Font.GothamSemibold,
                         TextSize = 10,
                         Parent = divider
                     })
+                    local lineR = Create("Frame", {
+                        Size = UDim2.new(0.5, -40, 0, 1),
+                        Position = UDim2.new(0.5, 40, 0.5, 0),
+                        BackgroundColor3 = theme.BorderLight,
+                        BackgroundTransparency = 0.5,
+                        BorderSizePixel = 0,
+                        Parent = divider
+                    })
+                    Library:RegisterElement(lineL, "BorderLight")
+                    Library:RegisterElement(lineR, "BorderLight")
                 else
                     Create("Frame", {
                         Size = UDim2.new(1, 0, 0, 1),
                         Position = UDim2.new(0, 0, 0.5, 0),
-                        BackgroundColor3 = theme.Border,
+                        BackgroundColor3 = theme.BorderLight,
+                        BackgroundTransparency = 0.4,
                         BorderSizePixel = 0,
                         Parent = divider
                     })
@@ -3739,16 +3767,24 @@ function Library:CreateWindow(options)
                 local tabbox = Create("Frame", {
                     Size = UDim2.new(1, 0, 0, 0),
                     AutomaticSize = Enum.AutomaticSize.Y,
-                    BackgroundColor3 = theme.Element,
+                    BackgroundColor3 = theme.InputBg,
+                    BackgroundTransparency = 0,
                     BorderSizePixel = 0,
                     ClipsDescendants = true,
                     Parent = container
                 }, {
-                    Create("UICorner", {CornerRadius = UDim.new(0, 6)})
+                    Create("UICorner", {CornerRadius = UDim.new(0, 8)})
                 })
+                local tabboxStroke = Instance.new("UIStroke")
+                tabboxStroke.Color = theme.Border
+                tabboxStroke.Thickness = 1
+                tabboxStroke.Parent = tabbox
+                Library:RegisterElement(tabbox, "InputBg")
+                Library:RegisterElement(tabboxStroke, "Border", "Color")
                 local tabHeader = Create("ScrollingFrame", {
-                    Size = UDim2.new(1, 0, 0, 26),
-                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 30),
+                    BackgroundColor3 = theme.Element,
+                    BackgroundTransparency = 0,
                     ScrollBarThickness = 0,
                     CanvasSize = UDim2.fromScale(0, 0),
                     AutomaticCanvasSize = Enum.AutomaticSize.X,
@@ -3760,12 +3796,13 @@ function Library:CreateWindow(options)
                         Padding = UDim.new(0, 2),
                         SortOrder = Enum.SortOrder.LayoutOrder
                     }),
-                    Create("UIPadding", {PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2)})
+                    Create("UIPadding", {PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 4), PaddingTop = UDim.new(0, 4), PaddingBottom = UDim.new(0, 4)})
                 })
+                Library:RegisterElement(tabHeader, "Element")
                 local tabContent = Create("Frame", {
-                    Size = UDim2.new(1, -10, 0, 0),
+                    Size = UDim2.new(1, -12, 0, 0),
                     AutomaticSize = Enum.AutomaticSize.Y,
-                    Position = UDim2.new(0, 5, 0, 28),
+                    Position = UDim2.new(0, 6, 0, 34),
                     BackgroundTransparency = 1,
                     Parent = tabbox
                 })
@@ -3775,17 +3812,17 @@ function Library:CreateWindow(options)
                 function TabboxFuncs:AddTab(name)
                     local tabBtn = Create("TextButton", {
                         AutomaticSize = Enum.AutomaticSize.X,
-                        Size = UDim2.new(0, 0, 1, -4),
-                        BackgroundColor3 = theme.ToggleOff,
-                        BackgroundTransparency = 0.5,
+                        Size = UDim2.new(0, 0, 1, 0),
+                        BackgroundColor3 = theme.InputBg,
+                        BackgroundTransparency = 1,
                         Text = name,
                         TextColor3 = theme.TextDim,
-                        Font = Enum.Font.Gotham,
+                        Font = Enum.Font.GothamSemibold,
                         TextSize = 11,
                         AutoButtonColor = false,
                         Parent = tabHeader
                     }, {
-                        Create("UICorner", {CornerRadius = UDim.new(0, 4)}),
+                        Create("UICorner", {CornerRadius = UDim.new(0, 5)}),
                         Create("UIPadding", {PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10)})
                     })
                     local tabPage = Create("Frame", {
@@ -3802,14 +3839,10 @@ function Library:CreateWindow(options)
                     local function activate()
                         for _, t in ipairs(tabs) do
                             t.page.Visible = false
-                            t.btn.BackgroundTransparency = 0.5
-                            t.btn.BackgroundColor3 = theme.ToggleOff
-                            t.btn.TextColor3 = theme.TextDim
+                            Tween(t.btn, {BackgroundTransparency = 1, TextColor3 = theme.TextDim})
                         end
                         tabPage.Visible = true
-                        tabBtn.BackgroundTransparency = 0
-                        tabBtn.BackgroundColor3 = theme.Accent
-                        tabBtn.TextColor3 = theme.Text
+                        Tween(tabBtn, {BackgroundTransparency = 0, BackgroundColor3 = theme.Accent, TextColor3 = theme.Text})
                         activeTab = tabPage
                     end
 
