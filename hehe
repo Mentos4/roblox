@@ -760,8 +760,8 @@ function Library:CreateButton(parent, options)
     local confirmText = options.ConfirmText
     local isRisky = options.Risky or false
     local btn = Create("TextButton", {
-        Size = UDim2.new(1, 0, 0, 28),
-        BackgroundColor3 = self.Theme.Element,
+        Size = UDim2.new(1, 0, 0, 30),
+        BackgroundColor3 = self.Theme.InputBg,
         Text = btnName,
         TextColor3 = isRisky and Color3.fromRGB(255, 100, 80) or self.Theme.Text,
         Font = Enum.Font.GothamMedium,
@@ -770,13 +770,24 @@ function Library:CreateButton(parent, options)
         ClipsDescendants = true,
         Parent = parent
     }, {
-        Create("UICorner", {CornerRadius = UDim.new(0, 6)})
+        Create("UICorner", {CornerRadius = UDim.new(0, 7)})
     })
     local btnStroke = Instance.new("UIStroke")
     btnStroke.Color = isRisky and Color3.fromRGB(180, 60, 60) or self.Theme.Border
     btnStroke.Thickness = 1
     btnStroke.Parent = btn
-    self:RegisterElement(btn, "Element")
+    -- Hover accent strip (left edge, hidden by default)
+    local accentStrip = Create("Frame", {
+        Size = UDim2.new(0, 3, 1, -10),
+        Position = UDim2.new(0, 0, 0.5, -((30-10)/2)),
+        BackgroundColor3 = isRisky and Color3.fromRGB(255, 100, 80) or self.Theme.Accent,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        ZIndex = 2,
+        Parent = btn,
+    }, {Create("UICorner", {CornerRadius = UDim.new(1, 0)})})
+    if not isRisky then self:RegisterElement(accentStrip, "Accent") end
+    self:RegisterElement(btn, "InputBg")
     if not isRisky then
         self:RegisterElement(btnStroke, "Border", "Color")
         self:RegisterElement(btn, "Text", "TextColor3")
@@ -785,9 +796,11 @@ function Library:CreateButton(parent, options)
     local waitingConfirm = false
     btn.MouseEnter:Connect(function()
         Tween(btn, {BackgroundColor3 = self.Theme.ElementHover})
+        Tween(accentStrip, {BackgroundTransparency = 0}, 0.12)
     end)
     btn.MouseLeave:Connect(function()
-        Tween(btn, {BackgroundColor3 = self.Theme.Element})
+        Tween(btn, {BackgroundColor3 = self.Theme.InputBg})
+        Tween(accentStrip, {BackgroundTransparency = 1}, 0.12)
         if waitingConfirm then
             waitingConfirm = false
             btn.Text = btnName
@@ -854,12 +867,12 @@ function Library:CreateToggle(parent, options)
     local state = default
     local keybind = options.Keybind or Enum.KeyCode.Unknown
     local toggle = Create("Frame", {
-        Size = UDim2.new(1, 0, 0, 20),
+        Size = UDim2.new(1, 0, 0, 24),
         BackgroundTransparency = 1,
         Parent = parent
     })
     local toggleLabel = Create("TextLabel", {
-        Size = self.IsMobile and UDim2.new(1, -45, 1, 0) or UDim2.new(1, -80, 1, 0),
+        Size = self.IsMobile and UDim2.new(1, -50, 1, 0) or UDim2.new(1, -116, 1, 0),
         BackgroundTransparency = 1,
         Text = toggleName,
         TextColor3 = self.Theme.Text,
@@ -871,26 +884,26 @@ function Library:CreateToggle(parent, options)
     })
     self:RegisterElement(toggleLabel, "Text", "TextColor3")
     local switchBg = Create("Frame", {
-        Size = UDim2.new(0, 36, 0, 18),
-        Position = UDim2.new(1, -36, 0.5, -9), 
+        Size = UDim2.new(0, 42, 0, 22),
+        Position = UDim2.new(1, -42, 0.5, -11),
         BackgroundColor3 = state and self.Theme.Toggle or self.Theme.ToggleOff,
         BorderSizePixel = 0,
         Parent = toggle
     }, {Create("UICorner", {CornerRadius = UDim.new(1, 0)})})
     local knob = Create("Frame", {
-        Size = UDim2.new(0, 14, 0, 14),
-        Position = state and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7),
+        Size = UDim2.new(0, 16, 0, 16),
+        Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8),
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BorderSizePixel = 0,
         Parent = switchBg
     }, {
         Create("UICorner", {CornerRadius = UDim.new(1, 0)}),
-        Create("UIStroke", {Color = Color3.new(0,0,0), Transparency = 0.9, Thickness = 1})
+        Create("UIStroke", {Color = Color3.new(0,0,0), Transparency = 0.85, Thickness = 1})
     })
-    -- Layout from right edge: [switchBg -36..0] [clearBtn -55..-39] [keybindBtn -100..-60]
+    -- Layout from right edge: [switchBg -42..0] [clearBtn -61..-45] [keybindBtn -106..-66]
     local keybindBtn = Create("TextButton", {
         Size = UDim2.new(0, 40, 0, 16),
-        Position = UDim2.new(1, -100, 0.5, -8),
+        Position = UDim2.new(1, -106, 0.5, -8),
         BackgroundColor3 = self.Theme.Element,
         Text = (keybind ~= Enum.KeyCode.Unknown) and keybind.Name:upper() or "NONE",
         TextColor3 = self.Theme.TextDim,
@@ -904,7 +917,7 @@ function Library:CreateToggle(parent, options)
     -- ✕ clear button: sits between keybindBtn and the toggle switch
     local clearBtn = Create("TextButton", {
         Size = UDim2.new(0, 16, 0, 16),
-        Position = UDim2.new(1, -55, 0.5, -8),
+        Position = UDim2.new(1, -61, 0.5, -8),
         BackgroundColor3 = Color3.fromRGB(180, 60, 60),
         Text = "X",
         TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -937,7 +950,7 @@ function Library:CreateToggle(parent, options)
             state = val
             s.Value = val
             Tween(switchBg, {BackgroundColor3 = val and self.Theme.Toggle or self.Theme.ToggleOff})
-            Tween(knob, {Position = val and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)})
+            Tween(knob, {Position = val and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)})
             callback(val)
             if s._kbUpdate then pcall(s._kbUpdate) end
         end,
@@ -1024,7 +1037,7 @@ function Library:CreateSlider(parent, options)
     local hideMax = options.HideMax or false
     local value = default
     local slider = Create("Frame", {
-        Size = UDim2.new(1, 0, 0, 28),
+        Size = UDim2.new(1, 0, 0, 34),
         BackgroundTransparency = 1,
         Parent = parent
     })
@@ -1053,7 +1066,7 @@ function Library:CreateSlider(parent, options)
         Parent = slider
     })
     local bar = Create("TextButton", {
-        Size = UDim2.new(1, 0, 0, 6),
+        Size = UDim2.new(1, 0, 0, 8),
         Position = UDim2.new(0, 0, 0, 20),
         BackgroundColor3 = self.Theme.ToggleOff,
         Text = "",
@@ -1067,7 +1080,7 @@ function Library:CreateSlider(parent, options)
         Parent = bar
     }, {Create("UICorner", {CornerRadius = UDim.new(1, 0)})})
     local sliderKnob = Create("Frame", {
-        Size = UDim2.new(0, 14, 0, 14),
+        Size = UDim2.new(0, 16, 0, 16),
         Position = UDim2.new((default - min) / (max - min), 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -1076,7 +1089,7 @@ function Library:CreateSlider(parent, options)
         Parent = bar
     }, {
         Create("UICorner", {CornerRadius = UDim.new(1, 0)}),
-        Create("UIStroke", {Color = Color3.new(0,0,0), Transparency = 0.85, Thickness = 1})
+        Create("UIStroke", {Color = Color3.new(0,0,0), Transparency = 0.8, Thickness = 1.5})
     })
     -- Floating tooltip shown while dragging
     local dragTooltip = Create("Frame", {
@@ -2018,8 +2031,10 @@ function Library:CreateWindow(options)
         BorderSizePixel = 0,
         Parent = gui
     }, {
-        Create("UICorner", {CornerRadius = UDim.new(0, 8)})
+        Create("UICorner", {CornerRadius = UDim.new(0, 10)}),
+        Create("UIStroke", {Color = theme.BorderLight, Thickness = 1}),
     })
+    self:RegisterElement(main:FindFirstChildOfClass("UIStroke"), "BorderLight", "Color")
     local mainScale = Instance.new("UIScale")
     mainScale.Scale = 0
     mainScale.Parent = main
@@ -2222,14 +2237,14 @@ function Library:CreateWindow(options)
     self:RegisterElement(watermark, "TextMuted", "TextColor3")
     local profileSection = Create("Frame", {
         Name = "PlayerProfile",
-        Size = UDim2.new(1, -10, 0, 50),
-        Position = UDim2.new(0, 5, 1, -55),
+        Size = UDim2.new(1, -10, 0, 54),
+        Position = UDim2.new(0, 5, 1, -59),
         BackgroundColor3 = theme.Element,
-        BackgroundTransparency = 0.5,
+        BackgroundTransparency = 0,
         ClipsDescendants = true,
         Parent = sidebar
     }, {
-        Create("UICorner", {CornerRadius = UDim.new(0, 6)})
+        Create("UICorner", {CornerRadius = UDim.new(0, 8)})
     })
     local profileStroke = Instance.new("UIStroke")
     profileStroke.Color = theme.Border
@@ -2325,10 +2340,23 @@ function Library:CreateWindow(options)
     self:RegisterElement(content, "Content")
     local header = Create("Frame", {
         Name = "Header",
-        Size = UDim2.new(1, 0, 0, 50),
-        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 54),
+        BackgroundColor3 = theme.Background,
+        BackgroundTransparency = 0.5,
+        BorderSizePixel = 0,
         Parent = content,
+    }, {
+        Create("UICorner", {CornerRadius = UDim.new(0, 8)}),
     })
+    -- Bottom divider under header
+    Create("Frame", {
+        Size = UDim2.new(1, -20, 0, 1),
+        Position = UDim2.new(0, 10, 1, -1),
+        BackgroundColor3 = theme.Border,
+        BorderSizePixel = 0,
+        Parent = header,
+    })
+    self:RegisterElement(header, "Background")
     
     local splashText = Create("TextLabel", {
         Name = "SplashText",
@@ -2597,7 +2625,7 @@ function Library:CreateWindow(options)
     })
     self:RegisterElement(contentCover, "Content")
     local titleLabel = Create("TextLabel", {
-        Size = UDim2.new(0, 200, 0, 40),
+        Size = UDim2.new(0, 200, 0, 44),
         Position = UDim2.new(0, 15, 0, 5),
         BackgroundTransparency = 1,
         Text = name:upper():gsub("(%w+)%s*(%w*)", function(a, b) 
@@ -2609,7 +2637,7 @@ function Library:CreateWindow(options)
         RichText = true,
         TextColor3 = theme.Text,
         Font = Enum.Font.GothamBold,
-        TextSize = 18,
+        TextSize = 20,
         TextXAlignment = Enum.TextXAlignment.Left,
         Parent = header
     })
@@ -2830,7 +2858,7 @@ function Library:CreateWindow(options)
         end
         local tabBtn = Create("TextButton", {
             Name = tabName,
-            Size = UDim2.new(1, -16, 0, 36),
+            Size = UDim2.new(1, -16, 0, 40),
             BackgroundColor3 = theme.SidebarActive,
             BackgroundTransparency = 1,
             Text = "",
@@ -2838,12 +2866,12 @@ function Library:CreateWindow(options)
             ClipsDescendants = true,
             Parent = tabList,
             LayoutOrder = type(tabOptions) == "table" and tabOptions.LayoutOrder or 0
-        }, {Create("UICorner", {CornerRadius = UDim.new(0, 7)})})
+        }, {Create("UICorner", {CornerRadius = UDim.new(0, 8)})})
 
         -- Left accent stripe (only visible when active)
         local tabAccentBar = Create("Frame", {
-            Size = UDim2.new(0, 3, 0.55, 0),
-            Position = UDim2.new(0, 0, 0.225, 0),
+            Size = UDim2.new(0, 3, 0.5, 0),
+            Position = UDim2.new(0, 0, 0.25, 0),
             BackgroundColor3 = theme.Accent,
             BorderSizePixel = 0,
             Visible = false,
@@ -2852,8 +2880,8 @@ function Library:CreateWindow(options)
         Library:RegisterElement(tabAccentBar, "Accent")
 
         local tabIcon = Create("ImageLabel", {
-            Size = UDim2.new(0, 18, 0, 18),
-            Position = UDim2.new(0, 13, 0.5, -9),
+            Size = UDim2.new(0, 20, 0, 20),
+            Position = UDim2.new(0, 14, 0.5, -10),
             BackgroundTransparency = 1,
             ImageColor3 = theme.TextMuted,
             Parent = tabBtn,
@@ -2861,13 +2889,13 @@ function Library:CreateWindow(options)
         Library:ApplyIcon(tabIcon, tabIconName)
 
         local tabLabel = Create("TextLabel", {
-            Size = UDim2.new(1, -42, 1, 0),
-            Position = UDim2.new(0, 38, 0, 0),
+            Size = UDim2.new(1, -46, 1, 0),
+            Position = UDim2.new(0, 42, 0, 0),
             BackgroundTransparency = 1,
             Text = tabName,
             TextColor3 = theme.TextMuted,
             Font = Enum.Font.GothamMedium,
-            TextSize = 12,
+            TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextTruncate = Enum.TextTruncate.AtEnd,
             ClipsDescendants = true,
@@ -2875,8 +2903,8 @@ function Library:CreateWindow(options)
         })
         local page = Create("ScrollingFrame", {
             Name = tabName,
-            Size = UDim2.new(1, -20, 1, -55),
-            Position = UDim2.new(0, 10, 0, 50),
+            Size = UDim2.new(1, -20, 1, -60),
+            Position = UDim2.new(0, 10, 0, 56),
             BackgroundTransparency = 1,
             ScrollBarThickness = isSmallScreen and 4 or 2,
             ScrollBarImageColor3 = theme.Accent,
@@ -2967,27 +2995,27 @@ function Library:CreateWindow(options)
                 Size = UDim2.new(1, 0, 0, 0),
                 AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundColor3 = theme.Element,
-                BackgroundTransparency = 0.45,
+                BackgroundTransparency = 0,
                 ClipsDescendants = false,
                 Parent = parent
             }, {
-                Create("UICorner", {CornerRadius = UDim.new(0, 8)})
+                Create("UICorner", {CornerRadius = UDim.new(0, 10)})
             })
             local sectionStroke = Instance.new("UIStroke")
-            sectionStroke.Color = theme.Border
+            sectionStroke.Color = theme.BorderLight
             sectionStroke.Thickness = 1
             sectionStroke.Parent = section
             Create("UIPadding", {
-                PaddingLeft   = UDim.new(0, 10), PaddingRight  = UDim.new(0, 10),
-                PaddingTop    = UDim.new(0, 8),  PaddingBottom = UDim.new(0, 10),
+                PaddingLeft   = UDim.new(0, 12), PaddingRight  = UDim.new(0, 12),
+                PaddingTop    = UDim.new(0, 10), PaddingBottom = UDim.new(0, 12),
                 Parent = section
             })
             Library:RegisterElement(section, "Element")
-            Library:RegisterElement(sectionStroke, "Border", "Color")
+            Library:RegisterElement(sectionStroke, "BorderLight", "Color")
 
             -- Header row: optional icon + title + chevron
             local headerRow = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 20),
+                Size = UDim2.new(1, 0, 0, 24),
                 BackgroundTransparency = 1,
                 Parent = section,
             })
@@ -3009,13 +3037,13 @@ function Library:CreateWindow(options)
                 Position = UDim2.new(0, iconOffsetX, 0, 0),
                 BackgroundTransparency = 1,
                 Text = sectionName,
-                TextColor3 = theme.Text,
+                TextColor3 = theme.Accent,
                 Font = Enum.Font.GothamBold,
                 TextSize = 12,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = headerRow,
             })
-            Library:RegisterElement(titleLabel, "Text", "TextColor3")
+            Library:RegisterElement(titleLabel, "Accent", "TextColor3")
 
             -- Chevron
             local chevron = Create("ImageLabel", {
@@ -3029,24 +3057,27 @@ function Library:CreateWindow(options)
             Library:ApplyIcon(chevron, "chevron-down")
             Library:RegisterElement(chevron, "TextMuted", "ImageColor3")
 
+            local headerLine = Create("Frame", {
+                Size = UDim2.new(1, 0, 0, 1),
+                Position = UDim2.new(0, 0, 1, 2),
+                BackgroundColor3 = theme.Accent,
+                BackgroundTransparency = 0.75,
+                BorderSizePixel = 0,
+                Parent = headerRow,
+            })
+            Library:RegisterElement(headerLine, "Accent")
+
             local container = Create("Frame", {
                 Name = "Container",
                 Size = UDim2.new(1, 0, 0, 0),
                 AutomaticSize = Enum.AutomaticSize.Y,
-                Position = UDim2.new(0, 0, 0, 24),
-                BackgroundColor3 = theme.Sidebar,
-                BackgroundTransparency = 0.45,
-                ClipsDescendants = true,
+                Position = UDim2.new(0, 0, 0, 30),
+                BackgroundTransparency = 1,
+                ClipsDescendants = false,
                 Parent = section
             }, {
-                Create("UIListLayout", {Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder}),
-                Create("UIPadding", {
-                    PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8),
-                    PaddingTop  = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8),
-                }),
-                Create("UICorner", {CornerRadius = UDim.new(0, 6)})
+                Create("UIListLayout", {Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder}),
             })
-            Library:RegisterElement(container, "Sidebar")
 
             -- Collapse toggle: click header row to fold/unfold
             local isCollapsed = false
