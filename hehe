@@ -320,26 +320,38 @@ function Library:CloseAllDropdowns()
 end
 function Library:GetIcon(iconName)
     if not iconName or iconName == "" then return nil end
-    
 
+    -- Direct asset ID or number → bypass icon pack entirely
     if type(iconName) == "number" then
-        iconName = "rbxassetid://" .. tostring(iconName)
+        return {
+            Url = "rbxassetid://" .. tostring(iconName),
+            ImageRectOffset = Vector2.zero,
+            ImageRectSize = Vector2.zero,
+            Custom = true,
+        }
+    end
+    if type(iconName) == "string" and iconName:match("^rbxassetid://") then
+        return {
+            Url = iconName,
+            ImageRectOffset = Vector2.zero,
+            ImageRectSize = Vector2.zero,
+            Custom = true,
+        }
     end
 
+    -- Named icon → look up in Lucide pack
     if self.Icons then
         local success, icon = pcall(function()
             return self.Icons.GetAsset(iconName)
         end)
-        if success and icon then
+        if success and icon and icon.Url and icon.Url ~= "" then
             return icon
         end
     end
-    return {
-        Url = iconName,
-        ImageRectOffset = Vector2.zero,
-        ImageRectSize = Vector2.zero,
-        Custom = true
-    }
+
+    -- Name not found in pack → return nil so ApplyIcon clears the element
+    -- (avoids "random icon" caused by ImageRectSize=0 showing the full sprite sheet)
+    return nil
 end
 function Library:ApplyIcon(element, iconName)
     local iconData = self:GetIcon(iconName)
