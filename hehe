@@ -738,14 +738,22 @@ function Library:CreateToggle(parent, options)
         Size = UDim2.new(0, 14, 0, 14),
         Position = UDim2.new(1, -88, 0.5, -7),
         BackgroundColor3 = Color3.fromRGB(180, 50, 50),
-        Text = "×", TextColor3 = Color3.fromRGB(255, 255, 255),
-        TextXAlignment = Enum.TextXAlignment.Center,
-        TextYAlignment = Enum.TextYAlignment.Center,
-        Font = Enum.Font.GothamBold, TextSize = 9,
-        AutoButtonColor = false, ZIndex = 4,
+        Text = "", AutoButtonColor = false, ZIndex = 4,
         Visible = not self.IsMobile and (keybind ~= Enum.KeyCode.Unknown),
         Parent = toggle
-    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+    }, {
+        Create("UICorner", { CornerRadius = UDim.new(1, 0) }),
+        Create("TextLabel", {
+            Size = UDim2.new(1, 0, 1, 0),
+            Position = UDim2.new(0, 0, 0, -1),
+            BackgroundTransparency = 1,
+            Text = "x", TextColor3 = Color3.fromRGB(255, 255, 255),
+            Font = Enum.Font.GothamBold, TextSize = 8,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            TextYAlignment = Enum.TextYAlignment.Center,
+            ZIndex = 5
+        })
+    })
 
     self:RegisterElement(keybindBtn, "Element")
     table.insert(self.Registry, { Callback = function(t)
