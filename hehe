@@ -2176,6 +2176,16 @@ function Library:CreateWindow(options)
     self._mainWindow      = main
     main.Visible = false
 
+    -- Phase 1: floating splash text (no background, just text over the game)
+    local splashText = Create("TextLabel", {
+        Name = "SplashText",
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Text = "", TextColor3 = Color3.fromRGB(255, 255, 255),
+        Font = Enum.Font.GothamBlack, TextSize = 32,
+        ZIndex = 1200, Parent = gui
+    })
+
     -- Loading card, parented to gui (not main), fully transparent to start
     local loadScreen = Create("Frame", {
         Size = UDim2.fromOffset(340, 100),
@@ -2219,6 +2229,18 @@ function Library:CreateWindow(options)
     })
 
     task.spawn(function()
+        -- Phase 1: typewriter (floating text, no background)
+        local fullText = "Seisen Library"
+        for i = 1, #fullText do
+            splashText.Text = fullText:sub(1, i)
+            task.wait(0.06)
+        end
+        task.wait(1)
+        local fadeTween = TweenService:Create(splashText, TweenInfo.new(0.6), { TextTransparency = 1 })
+        fadeTween:Play(); fadeTween.Completed:Wait()
+        splashText:Destroy()
+        task.wait(0.2)
+
         -- Loading card fade-in
         local stroke = loadScreen:FindFirstChildWhichIsA("UIStroke")
         Tween(loadScreen, { BackgroundTransparency = 0.06 }, 0.35)
