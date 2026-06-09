@@ -2376,7 +2376,9 @@ function Library:CreateVStack(parent, options)
         Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, gap) })
     })
     if options and options.Background then
-        stack:FindFirstChildWhichIsA("UICorner") or Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = stack })
+        if not stack:FindFirstChildWhichIsA("UICorner") then
+            Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = stack })
+        end
     end
 
     local stackObj = {
