@@ -275,7 +275,9 @@ local function Create(class, props, children)
 end
 
 local function Tween(obj, props, duration)
-    TweenService:Create(obj, TweenInfo.new(duration or 0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), props):Play()
+    if not obj then return end
+    local tween = TweenService:Create(obj, TweenInfo.new(duration or 0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), props)
+    if tween then tween:Play() end
 end
 
 -- ── Notifications ────────────────────────────────────────────────
