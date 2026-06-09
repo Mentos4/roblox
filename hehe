@@ -1872,8 +1872,19 @@ end
 
 -- ── Toggle (show/hide) ────────────────────────────────────────────
 function Library:Toggle()
-    if self.ScreenGui then
+    if not self.ScreenGui then return end
+    local mw = self._mainWindow
+    local ms = self._mainWindowScale
+    if not mw or not ms then
         self.ScreenGui.Enabled = not self.ScreenGui.Enabled
+        return
+    end
+    if mw.Visible then
+        TweenService:Create(ms, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In), { Scale = 0 }):Play()
+        task.delay(0.32, function() if mw and mw.Parent then mw.Visible = false end end)
+    else
+        mw.Visible = true
+        TweenService:Create(ms, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), { Scale = 1 }):Play()
     end
 end
 
@@ -2158,81 +2169,112 @@ function Library:CreateWindow(options)
     end)
 
     -- ── Loading screen ────────────────────────────────────────────
-    main.Size = UDim2.new(0, 0, 0, 0)
+    local mainScale = Instance.new("UIScale")
+    mainScale.Scale = 0
+    mainScale.Parent = main
+    self._mainWindowScale = mainScale
+    self._mainWindow      = main
+    main.Visible = false
 
-    local loadingGui = Create("Frame", {
-        Name = "LoadingScreen", Size = UDim2.new(1, 0, 1, 0),
-        BackgroundColor3 = self.Theme.Background,
-        ZIndex = 100, Parent = main
-    }, { Create("UICorner", { CornerRadius = UDim.new(0, 12) }) })
+    -- Phase 1: typewriter splash, full screen, parented to gui
+    local splashBg = Create("Frame", {
+        Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = self.Theme.Background,
+        BorderSizePixel = 0, ZIndex = 1199, Parent = gui
+    })
+    local splashLabel = Create("TextLabel", {
+        Size = UDim2.new(1, -60, 0, 50),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        BackgroundTransparency = 1, Text = "",
+        TextColor3 = self.Theme.Text, Font = Enum.Font.GothamBold, TextSize = 32,
+        TextXAlignment = Enum.TextXAlignment.Center,
+        ZIndex = 1200, Parent = gui
+    })
 
-    local loadCard = Create("Frame", {
-        Size = UDim2.new(0, 220, 0, 72),
-        Position = UDim2.new(0.5, -110, 0.5, -36),
-        BackgroundColor3 = self.Theme.Element, ZIndex = 101, Parent = loadingGui
+    -- Phase 2: loading card, parented to gui (not main), fully transparent to start
+    local loadScreen = Create("Frame", {
+        Size = UDim2.fromOffset(340, 100),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        BackgroundColor3 = self.Theme.Element,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0, ZIndex = 1100, Parent = gui
     }, {
         Create("UICorner", { CornerRadius = UDim.new(0, 12) }),
-        Create("UIStroke", { Color = self.Theme.Accent, Thickness = 1, Transparency = 0.4 })
+        Create("UIStroke", { Color = self.Theme.Accent, Thickness = 1, Transparency = 1 }),
     })
-
-    -- Pulsing logo dot
-    local pulseDot = Create("Frame", {
-        Size = UDim2.new(0, 10, 0, 10), Position = UDim2.new(0, 20, 0.5, -5),
-        BackgroundColor3 = self.Theme.Accent, BorderSizePixel = 0, ZIndex = 102, Parent = loadCard
-    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-
-    Create("TextLabel", {
-        Size = UDim2.new(1, -48, 0, 20), Position = UDim2.new(0, 40, 0, 12),
+    local loadTitle = Create("TextLabel", {
+        Size = UDim2.new(1, -40, 0, 26), Position = UDim2.new(0, 20, 0, 14),
         BackgroundTransparency = 1, Text = winName,
-        TextColor3 = self.Theme.Text, Font = Enum.Font.GothamBold, TextSize = 13,
-        TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 102, Parent = loadCard
+        TextColor3 = self.Theme.Text, TextTransparency = 1,
+        Font = Enum.Font.GothamBold, TextSize = 15,
+        TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 1101, Parent = loadScreen
+    })
+    local loadSub = Create("TextLabel", {
+        Size = UDim2.new(1, -40, 0, 18), Position = UDim2.new(0, 20, 0, 44),
+        BackgroundTransparency = 1,
+        Text = subtitle ~= "" and subtitle or version,
+        TextColor3 = self.Theme.TextDim, TextTransparency = 1,
+        Font = Enum.Font.Gotham, TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 1101, Parent = loadScreen
     })
     local loadStatus = Create("TextLabel", {
-        Size = UDim2.new(1, -48, 0, 14), Position = UDim2.new(0, 40, 0, 34),
-        BackgroundTransparency = 1, Text = "Initialising...",
-        TextColor3 = self.Theme.TextDim, Font = Enum.Font.Gotham, TextSize = 10,
-        TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 102, Parent = loadCard
+        Size = UDim2.new(1, -40, 0, 16), Position = UDim2.new(0, 20, 0, 64),
+        BackgroundTransparency = 1, Text = "Loading Assets...",
+        TextColor3 = self.Theme.Accent, TextTransparency = 1,
+        Font = Enum.Font.GothamMedium, TextSize = 10,
+        TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 1101, Parent = loadScreen
     })
-    -- Progress bar inside card
-    local loadTrack = Create("Frame", {
-        Size = UDim2.new(1, -40, 0, 3),
-        Position = UDim2.new(0, 20, 0, 58),
-        BackgroundColor3 = self.Theme.ToggleOff, ZIndex = 102, Parent = loadCard
-    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-    local loadFill = Create("Frame", {
-        Size = UDim2.new(0, 0, 1, 0), BackgroundColor3 = self.Theme.Accent,
-        BorderSizePixel = 0, ZIndex = 103, Parent = loadTrack
-    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+    local loadWater = Create("TextLabel", {
+        Size = UDim2.new(1, -15, 0, 15), Position = UDim2.new(0, 0, 1, -18),
+        BackgroundTransparency = 1, Text = "Seisen Library",
+        TextColor3 = self.Theme.TextMuted or self.Theme.TextDim, TextTransparency = 1,
+        Font = Enum.Font.Gotham, TextSize = 10,
+        TextXAlignment = Enum.TextXAlignment.Right, ZIndex = 1101, Parent = loadScreen
+    })
 
-    -- Pulse animation loop
-    local pulseConn; pulseConn = RunService.Heartbeat:Connect(function()
-        local t = tick() % 1
-        local alpha = math.sin(t * math.pi)
-        pulseDot.BackgroundTransparency = 1 - alpha * 0.8
-    end)
+    task.spawn(function()
+        -- Phase 1: typewriter
+        for i = 1, #winName do
+            splashLabel.Text = winName:sub(1, i)
+            task.wait(0.055)
+        end
+        task.wait(0.9)
+        Tween(splashLabel, { TextTransparency = 1 }, 0.4)
+        Tween(splashBg,    { BackgroundTransparency = 1 }, 0.4)
+        task.wait(0.45)
+        pcall(function() splashBg:Destroy(); splashLabel:Destroy() end)
 
-    -- Animate window open + progress bar
-    Tween(main, { Size = UDim2.new(0, WIN_W, 0, WIN_H) }, 0.35)
-    task.delay(0.05, function() loadStatus.Text = "Loading library..." end)
-    Tween(loadFill, { Size = UDim2.new(0.45, 0, 1, 0) }, 0.3)
-    task.delay(0.35, function()
-        loadStatus.Text = "Building interface..."
-        Tween(loadFill, { Size = UDim2.new(0.85, 0, 1, 0) }, 0.25)
-    end)
-    task.delay(0.65, function()
-        loadStatus.Text = "Ready."
-        Tween(loadFill, { Size = UDim2.new(1, 0, 1, 0) }, 0.1)
-        task.delay(0.15, function()
-            pulseConn:Disconnect()
-            Tween(loadingGui, { BackgroundTransparency = 1 }, 0.2)
-            for _, d in ipairs(loadingGui:GetDescendants()) do
-                if d:IsA("TextLabel") or d:IsA("Frame") or d:IsA("ImageLabel") then
-                    pcall(function() Tween(d, { BackgroundTransparency = 1 }, 0.2) end)
-                    pcall(function() Tween(d, { TextTransparency = 1 }, 0.2) end)
-                end
-            end
-            task.delay(0.25, function() loadingGui:Destroy() end)
-        end)
+        -- Phase 2: loading card fade-in
+        local stroke = loadScreen:FindFirstChildWhichIsA("UIStroke")
+        Tween(loadScreen, { BackgroundTransparency = 0.06 }, 0.35)
+        if stroke then Tween(stroke, { Transparency = 0.25 }, 0.35) end
+        Tween(loadTitle,  { TextTransparency = 0 }, 0.35)
+        Tween(loadSub,    { TextTransparency = 0 }, 0.35)
+        Tween(loadStatus, { TextTransparency = 0 }, 0.35)
+        Tween(loadWater,  { TextTransparency = 0 }, 0.35)
+        task.wait(0.5)
+
+        loadStatus.Text = "Loading Assets..."
+        task.wait(0.55)
+        loadStatus.Text = "Initializing UI..."
+        task.wait(0.55)
+        loadStatus.Text = "Complete!"
+        task.wait(0.45)
+
+        -- Phase 3: fade out loading card
+        Tween(loadScreen, { BackgroundTransparency = 1 }, 0.35)
+        if stroke then Tween(stroke, { Transparency = 1 }, 0.35) end
+        Tween(loadTitle,  { TextTransparency = 1 }, 0.35)
+        Tween(loadSub,    { TextTransparency = 1 }, 0.35)
+        Tween(loadStatus, { TextTransparency = 1 }, 0.35)
+        Tween(loadWater,  { TextTransparency = 1 }, 0.35)
+        task.wait(0.4)
+        pcall(function() loadScreen:Destroy() end)
+
+        -- Phase 4: scale in main window
+        main.Visible = true
+        TweenService:Create(mainScale, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), { Scale = 1 }):Play()
     end)
 
     -- ── Tab & sidebar API ─────────────────────────────────────────
