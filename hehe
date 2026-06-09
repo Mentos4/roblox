@@ -651,30 +651,18 @@ function Library:CreateButton(parent, options)
         if waitingConfirm then waitingConfirm = false; btn.Text = btnName end
     end)
 
-    local function spawnRipple(pos)
-        local bPos  = btn.AbsolutePosition; local bSize = btn.AbsoluteSize
-        local scale = self.MainScale and self.MainScale.Scale or 1
-        local lx = (pos.X - bPos.X) / scale; local ly = (pos.Y - bPos.Y) / scale
-        local maxD = math.sqrt(bSize.X^2 + bSize.Y^2) / scale
-        -- Scale-based clip layer: stays exactly the button size, never expands AutomaticSize parents
-        local clip = Create("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1,
-            ClipsDescendants = true, ZIndex = btn.ZIndex, Parent = btn
-        })
-        local rip = Create("Frame", {
-            Size = UDim2.fromOffset(0, 0), Position = UDim2.fromOffset(lx, ly),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            BackgroundColor3 = Color3.new(1,1,1), BackgroundTransparency = 0.84,
-            BorderSizePixel = 0, ZIndex = btn.ZIndex + 1, Parent = clip,
-        }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-        Tween(rip, { Size = UDim2.fromOffset(maxD*2, maxD*2), BackgroundTransparency = 1 }, 0.42)
-        task.delay(0.48, function() clip:Destroy() end)
+    local function flashClick()
+        -- Background flash — no child Frames so AutomaticSize parents never expand
+        local flash = isRisky and Color3.fromRGB(90, 28, 28) or self.Theme.BorderLight
+        local rest  = isRisky and Color3.fromRGB(72, 22, 22)  or self.Theme.InputBg
+        Tween(btn, { BackgroundColor3 = flash }, 0.05)
+        task.delay(0.07, function() if btn and btn.Parent then Tween(btn, { BackgroundColor3 = rest }, 0.2) end end)
     end
 
     btn.MouseButton1Click:Connect(function()
         local btnObj = self.Options[options.Flag]
         if btnObj and btnObj._disabled then return end
-        spawnRipple(UserInputService:GetMouseLocation())
+        flashClick()
         if confirmText and not waitingConfirm then
             waitingConfirm = true; btn.Text = confirmText; return
         end
@@ -2571,8 +2559,8 @@ function Library:CreateSection(parent, name, iconName)
 
     function S:AddButton(opts)
         local f = Create("Frame", {
-            Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1,
-            AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = nextOrder(), Parent = container
+            Size = UDim2.new(1, 0, 0, 28), BackgroundTransparency = 1,
+            LayoutOrder = nextOrder(), Parent = container
         })
         return Library:CreateButton(f, opts)
     end
