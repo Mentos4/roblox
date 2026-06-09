@@ -656,14 +656,19 @@ function Library:CreateButton(parent, options)
         local scale = self.MainScale and self.MainScale.Scale or 1
         local lx = (pos.X - bPos.X) / scale; local ly = (pos.Y - bPos.Y) / scale
         local maxD = math.sqrt(bSize.X^2 + bSize.Y^2) / scale
+        -- Scale-based clip layer: stays exactly the button size, never expands AutomaticSize parents
+        local clip = Create("Frame", {
+            Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1,
+            ClipsDescendants = true, ZIndex = btn.ZIndex, Parent = btn
+        })
         local rip = Create("Frame", {
             Size = UDim2.fromOffset(0, 0), Position = UDim2.fromOffset(lx, ly),
             AnchorPoint = Vector2.new(0.5, 0.5),
             BackgroundColor3 = Color3.new(1,1,1), BackgroundTransparency = 0.84,
-            BorderSizePixel = 0, ZIndex = btn.ZIndex + 1, Parent = btn,
+            BorderSizePixel = 0, ZIndex = btn.ZIndex + 1, Parent = clip,
         }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
         Tween(rip, { Size = UDim2.fromOffset(maxD*2, maxD*2), BackgroundTransparency = 1 }, 0.42)
-        task.delay(0.48, function() rip:Destroy() end)
+        task.delay(0.48, function() clip:Destroy() end)
     end
 
     btn.MouseButton1Click:Connect(function()
@@ -740,13 +745,16 @@ function Library:CreateToggle(parent, options)
         Create("UICorner", { CornerRadius = UDim.new(0, 5) }),
     })
 
+    -- clearBtn centered on keybindBtn: keybindBtn center = (1, -100+19, 0.5, -8+8) = (1,-81,0.5,0)
     local clearBtn = Create("TextButton", {
         Size = UDim2.new(0, 14, 0, 14),
-        Position = UDim2.new(1, -57, 0.5, -7),
+        Position = UDim2.new(1, -88, 0.5, -7),
         BackgroundColor3 = Color3.fromRGB(180, 50, 50),
-        Text = "X", TextColor3 = Color3.fromRGB(255, 255, 255),
-        Font = Enum.Font.GothamBold, TextSize = 8,
-        AutoButtonColor = false, ZIndex = 3,
+        Text = "×", TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextXAlignment = Enum.TextXAlignment.Center,
+        TextYAlignment = Enum.TextYAlignment.Center,
+        Font = Enum.Font.GothamBold, TextSize = 9,
+        AutoButtonColor = false, ZIndex = 4,
         Visible = not self.IsMobile and (keybind ~= Enum.KeyCode.Unknown),
         Parent = toggle
     }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
@@ -1202,8 +1210,9 @@ function Library:CreateDropdown(parent, options)
     end
 
     field.MouseButton1Click:Connect(function()
+        local wasOpen = isOpen
         self:CloseAllDropdowns()
-        if isOpen then closePanel() else openPanel() end
+        if not wasOpen then openPanel() end
     end)
 
     local dropObj = {
