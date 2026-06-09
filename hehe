@@ -82,7 +82,7 @@ function Library:RegisterKeybindRow(name, getKeyFn, isToggle, getValueFn)
         local key = getKeyFn()
         local hasKey = key and key ~= Enum.KeyCode.Unknown
         row.Visible = hasKey
-        if hasKey then keyBadge.Text = key.Name:upper():sub(1, 6) end
+        if hasKey then keyBadge.Text = ShortKey(key) end
         if isToggle and stateLabel then
             local on = getValueFn and getValueFn()
             stateLabel.Text = on and "ON" or "OFF"
@@ -236,8 +236,8 @@ end
 
 -- ── Dropdown close-all ───────────────────────────────────────────
 function Library:CloseAllDropdowns()
-    for _, dropdown in ipairs(self.OpenDropdowns) do
-        if dropdown.Close then dropdown.Close() end
+    for _, closeFn in ipairs(self.OpenDropdowns) do
+        pcall(closeFn)
     end
     self.OpenDropdowns = {}
 end
@@ -278,6 +278,21 @@ local function Tween(obj, props, duration)
     if not obj then return end
     local tween = TweenService:Create(obj, TweenInfo.new(duration or 0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), props)
     if tween then tween:Play() end
+end
+
+local KEY_SHORT = {
+    LeftShift="LSHIFT", RightShift="RSHIFT",
+    LeftControl="LCTRL", RightControl="RCTRL",
+    LeftAlt="LALT", RightAlt="RALT",
+    LeftSuper="LWIN", RightSuper="RWIN",
+    Return="ENTER", BackSpace="BKSP",
+    CapsLock="CAPS", Space="SPACE",
+    Tab="TAB", Delete="DEL", Insert="INS",
+    Home="HOME", End="END", PageUp="PGup", PageDown="PGdn",
+}
+local function ShortKey(key)
+    if not key or key == Enum.KeyCode.Unknown then return "NONE" end
+    return KEY_SHORT[key.Name] or key.Name:upper():sub(1, 7)
 end
 
 -- ── Notifications ────────────────────────────────────────────────
@@ -389,7 +404,7 @@ function Library:Notify(notifyOpts)
         Size = UDim2.new(0, 16, 0, 16),
         Position = UDim2.new(1, -16, 0, 1),
         BackgroundTransparency = 1,
-        Text = "✕", TextColor3 = theme.TextMuted, TextTransparency = 1,
+        Text = "X", TextColor3 = theme.TextMuted, TextTransparency = 1,
         Font = Enum.Font.GothamBold, TextSize = 9,
         AutoButtonColor = false, ZIndex = 502, Parent = card,
     })
@@ -715,7 +730,7 @@ function Library:CreateToggle(parent, options)
         Size = UDim2.new(0, 38, 0, 16),
         Position = UDim2.new(1, -100, 0.5, -8),
         BackgroundColor3 = self.Theme.Element,
-        Text = (keybind ~= Enum.KeyCode.Unknown) and keybind.Name:upper() or "NONE",
+        Text = ShortKey(keybind),
         TextColor3 = self.Theme.Accent, Font = Enum.Font.GothamBold, TextSize = 9,
         AutoButtonColor = false, Visible = not self.IsMobile, ZIndex = 2, Parent = toggle
     }, {
@@ -727,7 +742,7 @@ function Library:CreateToggle(parent, options)
         Size = UDim2.new(0, 14, 0, 14),
         Position = UDim2.new(1, -57, 0.5, -7),
         BackgroundColor3 = Color3.fromRGB(180, 50, 50),
-        Text = "✕", TextColor3 = Color3.fromRGB(255, 255, 255),
+        Text = "X", TextColor3 = Color3.fromRGB(255, 255, 255),
         Font = Enum.Font.GothamBold, TextSize = 8,
         AutoButtonColor = false, ZIndex = 3,
         Visible = not self.IsMobile and (keybind ~= Enum.KeyCode.Unknown),
@@ -754,7 +769,7 @@ function Library:CreateToggle(parent, options)
         end,
         SetKeybind = function(s, key)
             keybind = key or Enum.KeyCode.Unknown; s.Keybind = keybind
-            keybindBtn.Text = (keybind ~= Enum.KeyCode.Unknown) and keybind.Name:upper() or "NONE"
+            keybindBtn.Text = ShortKey(keybind)
             updateClearBtn()
             if s._kbUpdate then pcall(s._kbUpdate) end
             if self._refreshKeybindEmptyHint then self._refreshKeybindEmptyHint() end
@@ -783,7 +798,7 @@ function Library:CreateToggle(parent, options)
                 keybindBtn.Text = "NONE"
             else
                 keybind = input.KeyCode; toggleObj.Keybind = input.KeyCode
-                keybindBtn.Text = input.KeyCode.Name:upper()
+                keybindBtn.Text = ShortKey(input.KeyCode)
             end
             updateClearBtn()
             if toggleObj._kbUpdate then pcall(toggleObj._kbUpdate) end
@@ -963,7 +978,7 @@ function Library:CreateKeybind(parent, options)
         Size = UDim2.new(0.5, -5, 0, 26),
         Position = UDim2.new(0.5, 5, 0.5, -13),
         BackgroundColor3 = self.Theme.InputBg,
-        Text = (currentKey ~= Enum.KeyCode.Unknown) and currentKey.Name:upper() or "NONE",
+        Text = ShortKey(currentKey),
         TextColor3 = self.Theme.Accent, Font = Enum.Font.GothamBold, TextSize = 11,
         Parent = keybind
     }, {
@@ -977,7 +992,7 @@ function Library:CreateKeybind(parent, options)
 
     local clearBtn = Create("TextButton", {
         Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(1, -20, 0.5, -10),
-        BackgroundColor3 = Color3.fromRGB(180, 50, 50), Text = "✕",
+        BackgroundColor3 = Color3.fromRGB(180, 50, 50), Text = "X",
         TextColor3 = Color3.fromRGB(255,255,255), Font = Enum.Font.GothamBold, TextSize = 9,
         AutoButtonColor = false, ZIndex = 3,
         Visible = (currentKey ~= Enum.KeyCode.Unknown), Parent = keybind
@@ -989,7 +1004,7 @@ function Library:CreateKeybind(parent, options)
         Value = currentKey, Type = "Keybind",
         SetValue = function(s, key)
             currentKey = key; s.Value = key
-            keyButton.Text = (key ~= Enum.KeyCode.Unknown) and key.Name:upper() or "NONE"
+            keyButton.Text = ShortKey(key)
             updateKeybindClearBtn()
             callback(key)
         end
@@ -998,7 +1013,7 @@ function Library:CreateKeybind(parent, options)
     local function updateKeybindClearBtn() clearBtn.Visible = (currentKey ~= Enum.KeyCode.Unknown) end
     keybindObj.SetValue = function(s, key)
         currentKey = key; s.Value = key
-        keyButton.Text = (key ~= Enum.KeyCode.Unknown) and key.Name:upper() or "NONE"
+        keyButton.Text = ShortKey(key)
         updateKeybindClearBtn(); callback(key)
     end
 
@@ -1357,7 +1372,7 @@ function Library:CreateColorPicker(parent, options)
         Size = UDim2.new(0, 60, 0, 20), Position = UDim2.new(1, -62, 0.5, -10),
         BackgroundColor3 = self.Theme.InputBg,
         Text = "#" .. value:ToHex():upper(),
-        TextColor3 = self.Theme.Accent, Font = Enum.Font.GothamMono, TextSize = 10,
+        TextColor3 = self.Theme.Accent, Font = Enum.Font.Code, TextSize = 10,
         TextXAlignment = Enum.TextXAlignment.Center, Parent = container
     }, {
         Create("UICorner", { CornerRadius = UDim.new(0, 6) }),
