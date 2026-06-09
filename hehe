@@ -616,10 +616,13 @@ function Library:CreateButton(parent, options)
         Parent = parent
     }, { Create("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
-    local btnStroke = Instance.new("UIStroke")
-    btnStroke.Color     = isRisky and riskyColor or self.Theme.Border
-    btnStroke.Thickness = 1
-    btnStroke.Parent    = btn
+    local btnStroke
+    if not isRisky then
+        btnStroke = Instance.new("UIStroke")
+        btnStroke.Color     = self.Theme.Border
+        btnStroke.Thickness = 1
+        btnStroke.Parent    = btn
+    end
 
     self:RegisterElement(btn, "InputBg")
     if not isRisky then
@@ -735,7 +738,6 @@ function Library:CreateToggle(parent, options)
         AutoButtonColor = false, Visible = not self.IsMobile, ZIndex = 2, Parent = toggle
     }, {
         Create("UICorner", { CornerRadius = UDim.new(0, 5) }),
-        Create("UIStroke", { Color = self.Theme.Border, Thickness = 1 })
     })
 
     local clearBtn = Create("TextButton", {
@@ -983,11 +985,9 @@ function Library:CreateKeybind(parent, options)
         Parent = keybind
     }, {
         Create("UICorner", { CornerRadius = UDim.new(0, 8) }),
-        Create("UIStroke", { Color = self.Theme.Border, Thickness = 1 })
     })
     self:RegisterElement(nameLabel,  "Text",  "TextColor3")
     self:RegisterElement(keyButton,  "InputBg")
-    self:RegisterElement(keyButton:FindFirstChild("UIStroke"), "Border", "Color")
     self:RegisterElement(keyButton,  "Accent", "TextColor3")
 
     local clearBtn = Create("TextButton", {
@@ -2176,22 +2176,7 @@ function Library:CreateWindow(options)
     self._mainWindow      = main
     main.Visible = false
 
-    -- Phase 1: typewriter splash, full screen, parented to gui
-    local splashBg = Create("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = self.Theme.Background,
-        BorderSizePixel = 0, ZIndex = 1199, Parent = gui
-    })
-    local splashLabel = Create("TextLabel", {
-        Size = UDim2.new(1, -60, 0, 50),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        BackgroundTransparency = 1, Text = "",
-        TextColor3 = self.Theme.Text, Font = Enum.Font.GothamBold, TextSize = 32,
-        TextXAlignment = Enum.TextXAlignment.Center,
-        ZIndex = 1200, Parent = gui
-    })
-
-    -- Phase 2: loading card, parented to gui (not main), fully transparent to start
+    -- Loading card, parented to gui (not main), fully transparent to start
     local loadScreen = Create("Frame", {
         Size = UDim2.fromOffset(340, 100),
         AnchorPoint = Vector2.new(0.5, 0.5),
@@ -2234,18 +2219,7 @@ function Library:CreateWindow(options)
     })
 
     task.spawn(function()
-        -- Phase 1: typewriter
-        for i = 1, #winName do
-            splashLabel.Text = winName:sub(1, i)
-            task.wait(0.055)
-        end
-        task.wait(0.9)
-        Tween(splashLabel, { TextTransparency = 1 }, 0.4)
-        Tween(splashBg,    { BackgroundTransparency = 1 }, 0.4)
-        task.wait(0.45)
-        pcall(function() splashBg:Destroy(); splashLabel:Destroy() end)
-
-        -- Phase 2: loading card fade-in
+        -- Loading card fade-in
         local stroke = loadScreen:FindFirstChildWhichIsA("UIStroke")
         Tween(loadScreen, { BackgroundTransparency = 0.06 }, 0.35)
         if stroke then Tween(stroke, { Transparency = 0.25 }, 0.35) end
