@@ -996,6 +996,8 @@ function Library:CreateKeybind(parent, options)
 
     local function updateClearBtn() clearBtn.Visible = (currentKey ~= Enum.KeyCode.Unknown) end
 
+    local function updateKeybindClearBtn() clearBtn.Visible = (currentKey ~= Enum.KeyCode.Unknown) end
+
     local keybindObj = {
         Value = currentKey, Type = "Keybind",
         SetValue = function(s, key)
@@ -1006,12 +1008,6 @@ function Library:CreateKeybind(parent, options)
         end
     }
 
-    local function updateKeybindClearBtn() clearBtn.Visible = (currentKey ~= Enum.KeyCode.Unknown) end
-    keybindObj.SetValue = function(s, key)
-        currentKey = key; s.Value = key
-        keyButton.Text = ShortKey(key)
-        updateKeybindClearBtn(); callback(key)
-    end
 
     local listening = false
     keyButton.MouseButton1Click:Connect(function()
