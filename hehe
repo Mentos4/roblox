@@ -2094,6 +2094,395 @@ function Library:CreateDivider(parent, options)
     return { Instance = div }
 end
 
+-- ── Dialog ────────────────────────────────────────────────────────
+-- Stored modal with Show/Close methods. Unlike Popup, call :Show() when needed.
+function Library:CreateDialog(options)
+    if not self.ScreenGui then return { Show = function() end, Close = function() end } end
+    local title    = options.Title or "Dialog"
+    local content  = options.Content or ""
+    local buttons  = options.Buttons or { { Name = "Close" } }
+    local iconName = options.Icon
+
+    local overlay = Create("Frame", {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 1,
+        Visible = false, ZIndex = 300, Parent = self.ScreenGui
+    })
+
+    local card = Create("Frame", {
+        Size = UDim2.new(0, 340, 0, 0), AutomaticSize = Enum.AutomaticSize.Y,
+        AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.45, 0),
+        BackgroundColor3 = self.Theme.Element, BorderSizePixel = 0, ZIndex = 301,
+        Parent = overlay
+    }, {
+        Create("UICorner", { CornerRadius = UDim.new(0, 14) }),
+        Create("UIStroke", { Color = self.Theme.Border, Thickness = 1 }),
+        Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }),
+    })
+
+    -- Header row (icon + title + close X)
+    local headerRow = Create("Frame", {
+        Size = UDim2.new(1, 0, 0, 44), BackgroundTransparency = 1,
+        LayoutOrder = 1, ZIndex = 301, Parent = card
+    }, {
+        Create("UIPadding", { PaddingLeft = UDim.new(0, 16), PaddingRight = UDim.new(0, 12) })
+    })
+    if iconName then
+        local ico = Create("ImageLabel", {
+            Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(0, 0, 0.5, -9),
+            BackgroundTransparency = 1, ImageColor3 = self.Theme.Accent, ZIndex = 302, Parent = headerRow
+        })
+        self:ApplyIcon(ico, iconName)
+    end
+    local icoOff = iconName and 26 or 0
+    Create("TextLabel", {
+        Size = UDim2.new(1, -(icoOff + 28), 1, 0), Position = UDim2.new(0, icoOff, 0, 0),
+        BackgroundTransparency = 1, Text = title,
+        TextColor3 = self.Theme.Text, Font = Enum.Font.GothamBold, TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 302, Parent = headerRow
+    })
+    local xBtn = Create("TextButton", {
+        Size = UDim2.new(0, 24, 0, 24), Position = UDim2.new(1, -24, 0.5, -12),
+        BackgroundTransparency = 1, Text = "✕",
+        TextColor3 = self.Theme.TextMuted, Font = Enum.Font.GothamBold, TextSize = 11,
+        AutoButtonColor = false, ZIndex = 302, Parent = headerRow
+    })
+
+    Create("Frame", { Size = UDim2.new(1, 0, 0, 1), BackgroundColor3 = self.Theme.Border, BorderSizePixel = 0, LayoutOrder = 2, ZIndex = 301, Parent = card })
+
+    Create("TextLabel", {
+        Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1, Text = content,
+        TextColor3 = self.Theme.TextDim, Font = Enum.Font.Gotham, TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left, TextWrapped = true,
+        LayoutOrder = 3, ZIndex = 302, Parent = card
+    }, { Create("UIPadding", { PaddingLeft = UDim.new(0, 16), PaddingRight = UDim.new(0, 16), PaddingTop = UDim.new(0, 12), PaddingBottom = UDim.new(0, 12) }) })
+
+    Create("Frame", { Size = UDim2.new(1, 0, 0, 1), BackgroundColor3 = self.Theme.Border, BorderSizePixel = 0, LayoutOrder = 4, ZIndex = 301, Parent = card })
+
+    local btnRow = Create("Frame", {
+        Size = UDim2.new(1, 0, 0, 46), BackgroundTransparency = 1,
+        LayoutOrder = 5, ZIndex = 301, Parent = card
+    }, {
+        Create("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), PaddingTop = UDim.new(0, 9), PaddingBottom = UDim.new(0, 9) }),
+        Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8), HorizontalAlignment = Enum.HorizontalAlignment.Right })
+    })
+
+    local dialogObj
+    dialogObj = {
+        Show = function()
+            overlay.Visible = true
+            Tween(overlay, { BackgroundTransparency = 0.5 }, 0.18)
+            card.Position = UDim2.new(0.5, 0, 0.42, 0)
+            Tween(card, { Position = UDim2.new(0.5, 0, 0.45, 0) }, 0.22)
+        end,
+        Close = function()
+            Tween(overlay, { BackgroundTransparency = 1 }, 0.18)
+            task.delay(0.2, function() if overlay and overlay.Parent then overlay.Visible = false end end)
+        end,
+    }
+    xBtn.MouseButton1Click:Connect(dialogObj.Close)
+
+    for i, bOpts in ipairs(buttons) do
+        local isPrimary = bOpts.Style == "primary" or bOpts.Primary
+        local b = Create("TextButton", {
+            Size = UDim2.new(0, 94, 1, -2), AutoButtonColor = false,
+            BackgroundColor3 = isPrimary and self.Theme.Accent or self.Theme.InputBg,
+            Text = bOpts.Name or "OK",
+            TextColor3 = isPrimary and Color3.new(1,1,1) or self.Theme.Text,
+            Font = Enum.Font.GothamMedium, TextSize = 11,
+            LayoutOrder = i, ZIndex = 302, Parent = btnRow
+        }, { Create("UICorner", { CornerRadius = UDim.new(0, 8) }) })
+        b.MouseButton1Click:Connect(function()
+            if bOpts.Callback then pcall(bOpts.Callback) end
+            dialogObj.Close()
+        end)
+    end
+
+    return dialogObj
+end
+
+-- ── Key System ────────────────────────────────────────────────────
+-- Key-gate dialog shown before the main window. Pass Key/Keys in CreateWindow opts.
+function Library:_ShowKeySystem(options, onSuccess)
+    if not self.ScreenGui then return end
+    local validKeys  = {}
+    if type(options.Key)  == "string" then validKeys[options.Key:upper()]  = true end
+    if type(options.Keys) == "table"  then for _, k in ipairs(options.Keys) do validKeys[k:upper()] = true end end
+    local keyLink  = options.KeyLink or nil
+    local title    = options.KeyTitle or "Key Required"
+    local saveFile = options.SaveKey ~= false
+
+    -- try saved key first
+    if saveFile then
+        pcall(function()
+            local saved = readfile and readfile("SeisenKey.txt") or ""
+            if validKeys[saved:upper():gsub("%s", "")] then
+                task.defer(onSuccess); return
+            end
+        end)
+    end
+
+    local overlay = Create("Frame", {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 0.45,
+        ZIndex = 500, Parent = self.ScreenGui
+    })
+
+    local card = Create("Frame", {
+        Size = UDim2.new(0, 320, 0, 0), AutomaticSize = Enum.AutomaticSize.Y,
+        AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.48, 0),
+        BackgroundColor3 = self.Theme.Element, ZIndex = 501, Parent = overlay
+    }, {
+        Create("UICorner", { CornerRadius = UDim.new(0, 14) }),
+        Create("UIStroke", { Color = self.Theme.Accent, Thickness = 1, Transparency = 0.55 }),
+        Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }),
+    })
+
+    local headPad = Create("Frame", { Size = UDim2.new(1, 0, 0, 48), BackgroundTransparency = 1, LayoutOrder = 1, Parent = card }, {
+        Create("UIPadding", { PaddingLeft = UDim.new(0, 16), PaddingRight = UDim.new(0, 16) }),
+    })
+    Create("TextLabel", {
+        Size = UDim2.new(1, 0, 0, 20), Position = UDim2.new(0, 0, 0, 8),
+        BackgroundTransparency = 1, Text = title,
+        TextColor3 = self.Theme.Text, Font = Enum.Font.GothamBold, TextSize = 15,
+        TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 502, Parent = headPad
+    })
+    Create("TextLabel", {
+        Size = UDim2.new(1, 0, 0, 14), Position = UDim2.new(0, 0, 0, 30),
+        BackgroundTransparency = 1, Text = "Enter your key to continue",
+        TextColor3 = self.Theme.TextDim, Font = Enum.Font.Gotham, TextSize = 10,
+        TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 502, Parent = headPad
+    })
+
+    local bodyPad = Create("Frame", { Size = UDim2.new(1, 0, 0, 68), BackgroundTransparency = 1, LayoutOrder = 2, Parent = card }, {
+        Create("UIPadding", { PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14), PaddingTop = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10) }),
+        Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }),
+    })
+
+    local inputFrame = Create("Frame", {
+        Size = UDim2.new(1, 0, 0, 28), BackgroundColor3 = self.Theme.InputBg,
+        LayoutOrder = 1, ZIndex = 502, Parent = bodyPad
+    }, {
+        Create("UICorner", { CornerRadius = UDim.new(0, 8) }),
+        Create("UIStroke", { Color = self.Theme.Border, Thickness = 1 }),
+    })
+    local keyInput = Create("TextBox", {
+        Size = UDim2.new(1, -12, 1, 0), Position = UDim2.new(0, 8, 0, 0),
+        BackgroundTransparency = 1, Text = "",
+        PlaceholderText = "Paste your key here...", PlaceholderColor3 = self.Theme.TextMuted,
+        TextColor3 = self.Theme.Text, Font = Enum.Font.Gotham, TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 503, Parent = inputFrame
+    })
+
+    local statusLbl = Create("TextLabel", {
+        Size = UDim2.new(1, 0, 0, 14), BackgroundTransparency = 1, Text = "",
+        TextColor3 = self.Theme.Error, Font = Enum.Font.Gotham, TextSize = 10,
+        TextXAlignment = Enum.TextXAlignment.Center, LayoutOrder = 2, ZIndex = 502, Parent = bodyPad
+    })
+
+    local btnRow = Create("Frame", {
+        Size = UDim2.new(1, 0, 0, 40), BackgroundTransparency = 1, LayoutOrder = 3, Parent = card
+    }, {
+        Create("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), PaddingTop = UDim.new(0, 6), PaddingBottom = UDim.new(0, 8) }),
+        Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8), HorizontalAlignment = Enum.HorizontalAlignment.Center })
+    })
+
+    if keyLink then
+        local linkBtn = Create("TextButton", {
+            Size = UDim2.new(0.46, 0, 1, -2), BackgroundColor3 = self.Theme.InputBg,
+            Text = "Get Key", TextColor3 = self.Theme.Accent,
+            Font = Enum.Font.GothamMedium, TextSize = 11, AutoButtonColor = false,
+            LayoutOrder = 1, ZIndex = 502, Parent = btnRow
+        }, { Create("UICorner", { CornerRadius = UDim.new(0, 8) }) })
+        linkBtn.MouseButton1Click:Connect(function() pcall(function() setclipboard(keyLink) end) linkBtn.Text = "Copied!" task.delay(2, function() linkBtn.Text = "Get Key" end) end)
+    end
+
+    local submitBtn = Create("TextButton", {
+        Size = UDim2.new(keyLink and 0.46 or 0.6, 0, 1, -2), BackgroundColor3 = self.Theme.Accent,
+        Text = "Submit", TextColor3 = Color3.new(1,1,1),
+        Font = Enum.Font.GothamBold, TextSize = 11, AutoButtonColor = false,
+        LayoutOrder = 2, ZIndex = 502, Parent = btnRow
+    }, { Create("UICorner", { CornerRadius = UDim.new(0, 8) }) })
+
+    local function trySubmit()
+        local entered = keyInput.Text:upper():gsub("%s", "")
+        if validKeys[entered] then
+            statusLbl.Text = ""
+            Tween(overlay, { BackgroundTransparency = 1 }, 0.25)
+            task.delay(0.28, function() pcall(function() overlay:Destroy() end) end)
+            if saveFile then pcall(function() if writefile then writefile("SeisenKey.txt", keyInput.Text) end end) end
+            onSuccess()
+        else
+            statusLbl.Text = "Invalid key — please try again."
+            Tween(inputFrame, { BackgroundColor3 = Color3.fromRGB(60, 20, 20) }, 0.1)
+            task.delay(0.6, function() Tween(inputFrame, { BackgroundColor3 = self.Theme.InputBg }, 0.3) end)
+        end
+    end
+
+    submitBtn.MouseButton1Click:Connect(trySubmit)
+    keyInput.FocusLost:Connect(function(enter) if enter then trySubmit() end end)
+end
+
+-- ── HStack ────────────────────────────────────────────────────────
+-- Horizontal container — add elements side-by-side with equal slots
+function Library:CreateHStack(parent, options)
+    local cols      = options.Columns or 2
+    local gap       = options.Gap or 6
+    local height    = options.Height or 0
+
+    local row = Create("Frame", {
+        Size = height > 0 and UDim2.new(1, 0, 0, height) or UDim2.new(1, 0, 0, 0),
+        BackgroundTransparency = 1,
+        AutomaticSize = height == 0 and Enum.AutomaticSize.Y or Enum.AutomaticSize.None,
+        Parent = parent
+    }, {
+        Create("UIListLayout", {
+            FillDirection = Enum.FillDirection.Horizontal,
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim.new(0, gap),
+            VerticalAlignment = Enum.VerticalAlignment.Top,
+        })
+    })
+
+    local slots = {}
+    for i = 1, cols do
+        local slot = Create("Frame", {
+            Size = UDim2.new(1/cols, i < cols and -math.ceil(gap*(cols-1)/cols) or 0, 0, 0),
+            BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.Y,
+            LayoutOrder = i, Parent = row
+        }, {
+            Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) })
+        })
+        slots[i] = slot
+    end
+
+    local stackObj = {
+        Instance = row,
+        Slots    = slots,
+        GetSlot  = function(_, i) return slots[i] end,
+    }
+    return stackObj
+end
+
+-- ── VStack ────────────────────────────────────────────────────────
+-- Vertical container with optional divider between children
+function Library:CreateVStack(parent, options)
+    local gap = options and options.Gap or 4
+
+    local stack = Create("Frame", {
+        Size = UDim2.new(1, 0, 0, 0),
+        BackgroundColor3 = (options and options.Background) and self.Theme.InputBg or Color3.new(0,0,0),
+        BackgroundTransparency = (options and options.Background) and 0 or 1,
+        AutomaticSize = Enum.AutomaticSize.Y,
+        Parent = parent
+    }, {
+        Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, gap) })
+    })
+    if options and options.Background then
+        stack:FindFirstChildWhichIsA("UICorner") or Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = stack })
+    end
+
+    local stackObj = {
+        Instance = stack,
+        Add = function(_, createFn, opts)
+            return createFn(stack, opts)
+        end,
+    }
+    return stackObj
+end
+
+-- ── TabSection ───────────────────────────────────────────────────
+-- Underline-style tab selector — visual alternative to pill Tabbox
+function Library:CreateTabSection(parent, options)
+    local tabs    = options.Tabs or {}
+    local default = options.Default or tabs[1]
+    local flag    = options.Flag
+    local TAB_H   = 28
+
+    local wrapper = Create("Frame", {
+        Size = UDim2.new(1, 0, 0, 0),
+        BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.Y,
+        Parent = parent
+    }, {
+        Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) })
+    })
+
+    -- Underline tab bar
+    local tabBar = Create("Frame", {
+        Size = UDim2.new(1, 0, 0, TAB_H),
+        BackgroundTransparency = 1, LayoutOrder = 1, Parent = wrapper
+    }, {
+        Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 0) }),
+        -- Bottom border line
+        Create("Frame", { Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 1, -1), BackgroundColor3 = self.Theme.Border, BorderSizePixel = 0 })
+    })
+
+    local tabFrames  = {}
+    local tabButtons = {}
+    local indicators = {}
+    local activeTab  = nil
+
+    local function activateTab(name)
+        activeTab = name
+        for tName, frame in pairs(tabFrames) do
+            frame.Visible = tName == name
+        end
+        for tName, btn in pairs(tabButtons) do
+            local active = tName == name
+            Tween(btn, { TextColor3 = active and self.Theme.Text or self.Theme.TextDim })
+        end
+        for tName, ind in pairs(indicators) do
+            Tween(ind, { BackgroundTransparency = tName == name and 0 or 1 })
+        end
+        if flag then self.Options[flag] = { Value = name } end
+    end
+
+    for i, tabName in ipairs(tabs) do
+        local tabSlot = Create("Frame", {
+            Size = UDim2.new(1/#tabs, 0, 1, 0),
+            BackgroundTransparency = 1, LayoutOrder = i, Parent = tabBar
+        })
+        local btn = Create("TextButton", {
+            Size = UDim2.new(1, 0, 1, -2), BackgroundTransparency = 1,
+            Text = tabName, TextColor3 = self.Theme.TextDim,
+            Font = Enum.Font.GothamMedium, TextSize = 11,
+            AutoButtonColor = false, Parent = tabSlot
+        })
+        -- Underline indicator
+        local ind = Create("Frame", {
+            Size = UDim2.new(0.6, 0, 0, 2),
+            AnchorPoint = Vector2.new(0.5, 1),
+            Position = UDim2.new(0.5, 0, 1, 0),
+            BackgroundColor3 = self.Theme.Accent, BackgroundTransparency = 1,
+            BorderSizePixel = 0, Parent = tabSlot
+        }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+
+        local content = Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1,
+            AutomaticSize = Enum.AutomaticSize.Y, Visible = false,
+            LayoutOrder = 2, Parent = wrapper
+        }, {
+            Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) }),
+            Create("UIPadding", { PaddingTop = UDim.new(0, 4) })
+        })
+
+        tabFrames[tabName]  = content
+        tabButtons[tabName] = btn
+        indicators[tabName] = ind
+        btn.MouseButton1Click:Connect(function() activateTab(tabName) end)
+    end
+
+    activateTab(default or tabs[1])
+
+    local tsObj = {
+        GetTab = function(_, name) return tabFrames[name] end,
+        SetTab = function(_, name) activateTab(name) end,
+    }
+    if flag then self.Options[flag] = tsObj end
+    return tsObj
+end
+
 -- ── Inline Tabbox ─────────────────────────────────────────────────
 -- Horizontal tab selector with per-tab content containers
 -- options.Tabs = { "Tab1", "Tab2" }; options.Side = "Left"|"Right"|nil (full-width)
@@ -2427,29 +2816,34 @@ function Library:CreateWindow(options)
         BackgroundTransparency = 1, Parent = content
     })
     local activeTitle = Create("TextLabel", {
-        Size = UDim2.new(1, -74, 1, 0), Position = UDim2.new(0, 16, 0, 0),
+        Size = UDim2.new(1, -90, 1, 0), Position = UDim2.new(0, 16, 0, 0),
         BackgroundTransparency = 1, Text = "",
         TextColor3 = self.Theme.Text, Font = Enum.Font.GothamBold, TextSize = 13,
         TextXAlignment = Enum.TextXAlignment.Left, Parent = contentHeader
     })
     self:RegisterElement(activeTitle, "Text", "TextColor3")
 
-    -- ── Window controls (traffic-light on content header right) ──────
-    local closeBtn = Create("TextButton", {
-        Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(1, -20, 0.5, -7),
-        BackgroundColor3 = self.Theme.Error, Text = "",
-        AutoButtonColor = false, ZIndex = 2, Parent = contentHeader
-    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-    local minBtn = Create("TextButton", {
-        Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(1, -38, 0.5, -7),
-        BackgroundColor3 = self.Theme.Warning, Text = "",
-        AutoButtonColor = false, ZIndex = 2, Parent = contentHeader
-    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-    local maxBtn = Create("TextButton", {
-        Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(1, -56, 0.5, -7),
-        BackgroundColor3 = self.Theme.Success, Text = "",
-        AutoButtonColor = false, ZIndex = 2, Parent = contentHeader
-    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+        -- ── Window controls (icon buttons on content header right) ───────
+    local function makeWinBtn(pos, bgColor, iconName, tooltipText)
+        local btn = Create("TextButton", {
+            Size = UDim2.new(0, 22, 0, 22), Position = pos,
+            BackgroundColor3 = bgColor, BackgroundTransparency = 0.82,
+            Text = "", AutoButtonColor = false, ZIndex = 3, Parent = contentHeader
+        }, { Create("UICorner", { CornerRadius = UDim.new(0, 6) }) })
+        local ico = Create("ImageLabel", {
+            Size = UDim2.new(0, 12, 0, 12), AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+            BackgroundTransparency = 1, ImageColor3 = bgColor,
+            ZIndex = 4, Parent = btn
+        })
+        self:ApplyIcon(ico, iconName)
+        btn.MouseEnter:Connect(function() Tween(btn, { BackgroundTransparency = 0.55 }) end)
+        btn.MouseLeave:Connect(function() Tween(btn, { BackgroundTransparency = 0.82 }) end)
+        return btn
+    end
+    local closeBtn = makeWinBtn(UDim2.new(1, -26, 0.5, -11), self.Theme.Error,    "x",          "Close")
+    local minBtn   = makeWinBtn(UDim2.new(1, -51, 0.5, -11), self.Theme.Warning,  "minus",      "Minimize")
+    local maxBtn   = makeWinBtn(UDim2.new(1, -76, 0.5, -11), self.Theme.Success,  "maximize-2", "Maximize")
 
     closeBtn.MouseButton1Click:Connect(function()
         Tween(main, { Size = UDim2.new(0, 0, 0, 0) }, 0.25)
@@ -2583,6 +2977,13 @@ function Library:CreateWindow(options)
     })
 
     task.spawn(function()
+        -- Key System gate (runs before splash if Key/Keys option set)
+        if options.Key or options.Keys then
+            local keyPassed = false
+            self:_ShowKeySystem(options, function() keyPassed = true end)
+            repeat task.wait(0.08) until keyPassed
+        end
+
         -- Phase 1: typewriter (floating text, no background)
         local fullText = "Seisen Library"
         for i = 1, #fullText do
@@ -3081,6 +3482,30 @@ function Library:CreateSection(parent, name, iconName)
             LayoutOrder = nextOrder(), Parent = container
         })
         return Library:CreateMultiButton(f, opts)
+    end
+
+    function S:AddTabSection(opts)
+        local f = Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1,
+            AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = nextOrder(), Parent = container
+        })
+        return Library:CreateTabSection(f, opts)
+    end
+
+    function S:AddHStack(opts)
+        local f = Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1,
+            AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = nextOrder(), Parent = container
+        })
+        return Library:CreateHStack(f, opts)
+    end
+
+    function S:AddVStack(opts)
+        local f = Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1,
+            AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = nextOrder(), Parent = container
+        })
+        return Library:CreateVStack(f, opts)
     end
 
     -- SaveManager compatibility: tab:CreateSection({Name,Side})
