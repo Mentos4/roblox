@@ -31,6 +31,8 @@ local Games = {
     ["6701277882"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_FishIt.lua",
     -- Garden Horizon
     ["9509842868"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/GardenHorizon",
+    -- Grow a Garden 2
+    ["10200395747"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/GrowaGarden2",
     -- Hypershot
     ["5995470825"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Hypershot.lua",
     -- Levelbound
