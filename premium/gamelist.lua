@@ -9,6 +9,8 @@ local Games = {
     ["7074860883"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AriseCrossover.lua",
     -- Arsenal
     ["111958650"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Arsenal.lua",
+    -- Evomon
+    ["9826885587"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/Evomon",
     -- Bee Garden
     ["8220767002"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Bee%20Garden",
     -- Blue Heater 2
