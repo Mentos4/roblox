@@ -1,4 +1,6 @@
 local Games = {
+    -- +1 Mine Per Click
+    ["10178802449"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/%2B1%20Mine%20Per%20Click",
     -- Anime Eternal
     ["7882829745"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AnimeEternal.lua",
     -- Anime Fight
