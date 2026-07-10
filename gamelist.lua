@@ -17,6 +17,8 @@ local Games = {
     ["8220767002"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Bee%20Garden",
     -- Blue Heater 2
     ["5803093656"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_BlueHeater2.lua",
+    -- Build a Soccer Team
+    ["10265803948"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Buildasoccerteam.txt",
     -- Build a Ring Farm
     ["10039338037"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/BuildaRingFarm",
     -- Build an Island
