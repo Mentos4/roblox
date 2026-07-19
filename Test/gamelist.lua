@@ -7,8 +7,10 @@ local Games = {
     ["8469926548"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AnimeFight.lua",
     -- Anime Ranger X
     ["9774981774"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AnimeRangerX.lua",
+    -- Anime Expedition
+    ["9774981774"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Test/test/AnimeExpedition",
     -- Arise Crossover
-    ["7074860883"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AriseCrossover.lua",
+    ["7613921865"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AriseCrossover.lua",
     -- Arsenal
     ["111958650"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Arsenal.lua",
     -- Bee Garden
