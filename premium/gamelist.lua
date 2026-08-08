@@ -67,6 +67,8 @@ local Games = {
     ["7671049560"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/TheForgeFinal.lua",
     -- Wizard Alchemy
     ["10006104044"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/Wizard%20Alchemy",
+    -- World Zero
+    ["985731078"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/World%20Zero",
 }
 
 return Games
