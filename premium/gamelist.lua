@@ -55,6 +55,8 @@ local Games = {
     ["7094518649"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_RestaurantTycoon3.lua",
     -- Rivals
     ["6035872082"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Rivals",
+    -- Run a Restaurant
+    ["9970645639"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Run%20a%20Restaurant",
     -- Slime RNG
     ["9792947201"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Slime%20RNG",
     -- Slime Seas
