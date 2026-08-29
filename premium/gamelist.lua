@@ -70,7 +70,7 @@ local Games = {
     -- Swordburst 3
     ["4093155512"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Swordburst3.lua",
     -- The Forge
-    ["7671049560"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/TheForgeFinal.lua",
+    ["7671049560"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/The%20Forge",
     -- Wizard Alchemy
     ["10006104044"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/Wizard%20Alchemy",
     -- World Zero
