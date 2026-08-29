@@ -29,6 +29,8 @@ local Games = {
     ["7541395924"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_BuildanIsland.lua",
     -- Build a Zoo
     ["8066283370"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_BuildAZoo.lua",
+    -- Clean all the Leave
+    ["10539411000"] = "https://github.com/Mentos4/roblox/blob/main/Script/Clean%20all%20the%20Leave",
     -- Dig a Brainrot
     ["8820222330"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_DigaBrainrot.lua",
     -- Dig to Earth
