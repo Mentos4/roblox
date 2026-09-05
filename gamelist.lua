@@ -71,6 +71,8 @@ local Games = {
     ["9802644580"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Summon%20Heroes",
     -- Swordburst 3
     ["4093155512"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Swordburst3.lua",
+    -- Steal an Egg
+    ["10563114921"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Steal%20an%20Egg",
     -- The Forge
     ["7671049560"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/The%20Forge",
     -- Wizard Alchemy
