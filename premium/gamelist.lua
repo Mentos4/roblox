@@ -57,6 +57,8 @@ local Games = {
     ["6867859535"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_RE%3AXL.lua",
     -- Restaurant Tycoon 3
     ["7094518649"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_RestaurantTycoon3.lua",
+    -- Ride a Pet
+    ["10035204815"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Ride%20a%20Pet",
     -- Rivals
     ["6035872082"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Rivals",
     -- Run a Restaurant
