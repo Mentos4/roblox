@@ -57,6 +57,8 @@ local Games = {
     ["9529182643"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Levelbound.lua",
     -- Plant vs Brainrot
     ["8316902627"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_PlantvsBrainrot.lua",
+    -- Pet Simulator 99
+    ["3317771874"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Pet%20Simulator%2099",
     -- Raft 101 Survival
     ["8662243497"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Raft%20101%20Survival.lua",
     -- RE:XL
