@@ -6,7 +6,7 @@ local Games = {
     -- Anime Astral Simulator
     ["10502841145"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Anime%20Astral%20Simulator",
     -- Anime Dice
-    {"10708913337"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Anime%20Dice",
+    ["10708913337"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Anime%20Dice",
     -- Anime Eternal
     ["7882829745"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_AnimeEternal.lua",
     -- Anime Fight
