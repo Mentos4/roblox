@@ -81,6 +81,8 @@ local Games = {
     ["9073775318"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Slime%20Seas",
     -- Summon Heroes
     ["9802644580"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Summon%20Heroes",
+    -- Tap Simulator Reborn
+    ["10629695169"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Tap%20Simulator%20Reborn",
     -- Swordburst 3
     ["4093155512"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Swordburst3.lua",
     -- Steal an Egg
