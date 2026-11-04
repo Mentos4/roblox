@@ -25,6 +25,8 @@ local Games = {
     ["9826885587"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/Evomon",
     -- Bee Garden
     ["8220767002"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Bee%20Garden",
+    -- Bloxfruit
+    ["994732206"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Bloxfruit",
     -- Blue Heater 2
     ["5803093656"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_BlueHeater2.lua",
     -- Break and Steal an Egg
