@@ -31,6 +31,8 @@ local Games = {
     ["6701277882"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_FishIt.lua",
     -- Hypershot
     ["5995470825"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_Hypershot.lua",
+    -- Murder Mystery 2
+    ["66654135"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/premium/Script/MurderMystery2.lua",
     -- Plant vs Brainrot
     ["8316902627"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Script_PlantvsBrainrot.lua",
     -- Pet Simulator 99
