@@ -27,6 +27,8 @@ local Games = {
     ["10629695169"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Tap%20Simulator%20Reborn",
     -- The Forge
     ["7671049560"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/The%20Forge",
+    -- Throw Food For Animals
+    ["10766972131"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Throw%20Food%20For%20Animals",
     -- World Zero (v1.0.10)
     ["985731078"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/World%20Zero",
 }
