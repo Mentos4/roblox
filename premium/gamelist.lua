@@ -1,4 +1,6 @@
 local Games = {
+    -- Anime Adventures
+    ["3183403065"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Anime%20Adventures",
     -- Anime Astral Simulator
     ["10502841145"] = "https://raw.githubusercontent.com/Mentos4/roblox/refs/heads/main/Script/Anime%20Astral%20Simulator",
     -- Anime Dice
